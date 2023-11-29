@@ -28,9 +28,14 @@ public class Main {
 
         JavaRDD<Double> sqrtRdd = myRdd.map((value) -> Math.sqrt(value));
 
-        sqrtRdd.foreach((value) -> System.out.println(value));
-
         System.out.println(result);
+
+        sqrtRdd.collect().forEach(System.out::println);
+
+        JavaRDD<Integer> singleIntegerRdd = myRdd.map((value) -> 1);
+        Integer count = singleIntegerRdd.reduce((value1 , value2) -> value1+ value2);
+
+        System.out.println("Count: "+count);
 
         sc.close();
     }
