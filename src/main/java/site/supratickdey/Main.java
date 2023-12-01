@@ -5,6 +5,7 @@ import org.apache.log4j.Logger;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
+import scala.Tuple2;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,20 +23,8 @@ public class Main {
         SparkConf conf = new SparkConf().setAppName("ASpark").setMaster("local[*]");
         JavaSparkContext sc = new JavaSparkContext(conf);
 
-        JavaRDD<Integer> myRdd = sc.parallelize(inputData);
-
-        Integer result = myRdd.reduce((value1, value2) -> value1 + value2);
-
-        JavaRDD<Double> sqrtRdd = myRdd.map((value) -> Math.sqrt(value));
-
-        System.out.println(result);
-
-        sqrtRdd.collect().forEach(System.out::println);
-
-        JavaRDD<Integer> singleIntegerRdd = myRdd.map((value) -> 1);
-        Integer count = singleIntegerRdd.reduce((value1 , value2) -> value1+ value2);
-
-        System.out.println("Count: "+count);
+        JavaRDD<Integer> originalIntegers = sc.parallelize(inputData);
+        JavaRDD<Tuple2<Integer, Double>> sqrtRdd = originalIntegers.map((value) -> new Tuple2<>(value, Math.sqrt(value)));
 
         sc.close();
     }
