@@ -1,5 +1,6 @@
 package site.supratickdey;
 
+import com.google.common.collect.Iterables;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.spark.SparkConf;
@@ -25,10 +26,17 @@ public class Main {
         SparkConf conf = new SparkConf().setAppName("ASpark").setMaster("local[*]");
         JavaSparkContext sc = new JavaSparkContext(conf);
 
+        // better approach
         sc.parallelize(inputData)
                 .mapToPair(rawValue -> new Tuple2<>(rawValue.split(":")[0], 1L))
                 .reduceByKey((value1, value2) -> value1 + value2)
                 .foreach(tuple -> System.out.println(tuple._1 + " has " + tuple._2 + " instances"));
+
+        // Not a good approach
+        sc.parallelize(inputData)
+                .mapToPair(rawValue -> new Tuple2<>(rawValue.split(":")[0], 1L))
+                .groupByKey()
+                .foreach(tuple -> System.out.println(tuple._1 + " has " + Iterables.size(tuple._2) + " instances"));
 
         /*
         Verbose implementation
